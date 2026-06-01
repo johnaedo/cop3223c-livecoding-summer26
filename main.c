@@ -1,23 +1,28 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "combat.h"
 
 void print_hero_stats(void);
 void print_monster_stats(void);
-double calculate_damage(int, int, int);
+void print_stats(char * name, int bravery, double health, int attack, int defense);
 
-int hero_bravery = 10;
-int hero_attack = 10;
-int hero_defense = 10;
-double hero_health = 10;
-char hero_name[50];
-
-int monster_attack = 12;
-int monster_defense = 10;
-double monster_health = 10;
-char monster_name[50] = "Decepticon";
 
 
 int main(void) {
+
+    int hero_bravery = 10;
+    int hero_attack = 10;
+    int hero_defense = 10;
+    double hero_health = 10;
+    char hero_name[50];
+
+    int monster_bravery = 0;
+    int monster_attack = 12;
+    int monster_defense = 10;
+    double monster_health = 10;
+    char monster_name[50] = "Decepticon";
+
+
     printf("===================================\n");
     printf("|   Legally Distinct from Zelda   |\n");
     printf("|            the sequel           |\n");
@@ -34,8 +39,8 @@ int main(void) {
         hero_health -= calculate_damage(0, monster_attack, hero_defense);
         if (hero_health < 0) hero_health = 0;
 
-        print_hero_stats();
-        print_monster_stats();
+        print_stats(hero_name, hero_bravery, hero_health, hero_attack, hero_defense);
+        print_stats(monster_name, 0, monster_health, monster_attack, monster_defense);
         printf("Enter 'd' to continue");
         char enter;
         fscanf(stdin, "%c", &enter);
@@ -54,33 +59,15 @@ int main(void) {
     
 }
 
-void print_hero_stats(void) {
+void print_stats(char *name, int bravery, double health, int attack, int defense) {
     printf("====================\n");
-    printf("| %-18s|\n", hero_name);
-    printf("| HP: %lf            |\n", hero_health);
-    printf("| ATTACK: %d DEF: %d|\n", hero_attack, hero_defense);
-    printf("| BRAVERY: %d.      |\n", hero_bravery);
+    printf("| %-18s|\n", name);
+    printf("| HP: %lf           |\n", health);
+    printf("| ATTACK: %d DEF: %d|\n", attack, defense);
+    if (bravery) printf("| BRAVERY: %d.      |\n", bravery);
     printf("====================|\n");
-};
-
-void print_monster_stats(void) {
-    printf("====================\n");
-    printf("| %-18s|\n", monster_name);
-    printf("| HP: %lf            |\n", monster_health);
-    printf("| ATTACK: %d DEF: %d|\n", monster_attack, monster_defense);
-    printf("====================|\n");
-};
-
-double calculate_damage(int bravery, int attack, int defense) {
-    float defense_modifier = 0.0;
-    srand(0);
-    defense_modifier = 1 + rand()%20;
-
-
-    double adjusted_attack = attack * (1 + (double) bravery/100);
-    printf("adjusted attack: %lf\n", adjusted_attack);
-    double damage = adjusted_attack - defense;
-    printf("damage: %lf\n", damage);
-    return (damage < 0) ? 0 : damage;
 
 }
+
+
+
