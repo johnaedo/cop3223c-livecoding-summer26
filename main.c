@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include "combat.h"
 
 void print_hero_stats(void);
@@ -10,11 +11,15 @@ void print_stats(char * name, int bravery, double health, int attack, int defens
 
 int main(void) {
 
+    const int potion_strength = 3;
+
     int hero_bravery = 10;
     int hero_attack = 10;
     int hero_defense = 10;
     double hero_health = 10;
     char hero_name[50];
+    int hero_potions = 3;
+    int magic_skill = 70;
 
     int monster_bravery = 0;
     int monster_attack = 12;
@@ -33,11 +38,18 @@ int main(void) {
 
     do {
         printf("%s Attacks!\n", hero_name);
-        monster_health -= calculate_damage(hero_bravery, hero_attack, monster_defense);
+        monster_health -= calculate_damage(hero_name, hero_bravery, hero_attack, monster_defense);
         if (monster_health < 0) monster_health = 0;
         printf("%s Counter-Attacks!\n", monster_name);
-        hero_health -= calculate_damage(0, monster_attack, hero_defense);
+        hero_health -= calculate_damage(monster_name, 0, monster_attack, hero_defense);
         if (hero_health < 0) hero_health = 0;
+        if (hero_health) {
+            srand(time(NULL));
+            int dice_roll = rand() % 100;
+            if (dice_roll < magic_skill) {
+                heal(&hero_health, &hero_potions, potion_strength);
+            }
+        }
 
         print_stats(hero_name, hero_bravery, hero_health, hero_attack, hero_defense);
         print_stats(monster_name, 0, monster_health, monster_attack, monster_defense);
