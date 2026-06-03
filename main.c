@@ -42,6 +42,7 @@ int main(void) {
         if (monster_health < 0) monster_health = 0;
         printf("%s Counter-Attacks!\n", monster_name);
         hero_health -= calculate_damage(monster_name, 0, monster_attack, hero_defense);
+        printf("current hero health: %f\n", hero_health);
         if (hero_health < 0) hero_health = 0;
         if (hero_health) {
             srand(time(NULL));
