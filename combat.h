@@ -1,7 +1,8 @@
 #ifndef COMBAT_H
 #define COMBAT_H
+#include "entity.h"
 
-double calculate_damage(const char *name, int bravery, int attack, int defense);
-void heal(double *health, int *potions, int potion_strength);
+double calculate_damage(entity_t attacker, entity_t defender);
+double heal(entity_t hero, int potion_strength);
 
 #endif
