@@ -1,111 +1,94 @@
+/* ============================================================
+   main.c — Legally Distinct from Zelda - the Sequel | Week 5a
+   "The Great Refactor"
+
+   Compile:
+     gcc -Wall -Wextra -std=c17 -o dungeon \
+         main.c entity.c combat.c inventory.c
+
+   Week 5a changes vs. Week 3:
+     ✓ Hero and Enemy are now structs — all stats in one place
+     ✓ run_combat takes Hero* and Enemy* — 2 params not 10
+     ✓ EnemyType enum replaces magic-number enemy categories
+     ✓ create_hero / create_enemy constructor pattern
+     ✓ XP tracking and loot are fields, not loose variables
+     ✓ Dungeon is an array of Enemy structs
+
+   INSTRUCTOR:
+   Session 5a is primarily the refactor demonstration. Build
+   entity.h/entity.c first (25 min), then show how combat.c
+   and main.c simplify. The "before and after" of run_combat's
+   parameter list is the headline moment.
+   ============================================================ */
+
 #include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include "combat.h"
+#include <string.h>
 #include "entity.h"
-
-void print_hero_stats(void);
-void print_monster_stats(void);
-void print_stats(entity_t entity);
-
-
+#include "combat.h"
+#include "inventory.h"
 
 int main(void) {
 
-    const int potion_strength = 3;
+    printf("╔══════════════════════════════════════╗\n");
+    printf("║      Legally Distinct from Zelda - the Sequel       ║\n");
+    printf("║      Week 5a — The Great Refactor    ║\n");
+    printf("╚══════════════════════════════════════╝\n\n");
 
-    entity_t hero = {
-        .bravery = 10,
-        .attack = 10,
-        .defense = 10,
-        .current_hp = 10,
-        .max_hp = 10,
-        .name = "Uncle Linus",
-        .potions = 3,
-        .magic_skill = 70,
-        .type = HERO
+    /* ── Hero creation ──────────────────────────────────────── */
+    char hero_name[64];
+    printf("Enter your hero's name: ");
+    fscanf(stdin, "%63s", hero_name);
+
+    Hero hero = create_hero(hero_name, 100, 15, 5);
+
+    /* Start with a couple of items */
+    inventory_add(hero.inventory, &hero.inv_count, "Health Potion");
+    inventory_add(hero.inventory, &hero.inv_count, "Torch");
+
+    printf("\n");
+    print_hero(&hero);
+    printf("\n");
+
+    /* ── Dungeon: array of Enemy structs ────────────────────── */
+    /* INSTRUCTOR: "This is the payoff. We define an entire dungeon
+       as an array of Enemy structs. No parallel arrays of names,
+       HPs, attacks. One array, one type, clean iteration." */
+    Enemy dungeon[] = {
+        create_enemy("Goblin Scout",  30,  7, 1, DECEPTICON_MINION, "Gold Coin"),
+        create_enemy("Orc Warrior",   70, 14, 6, DECEPTICON_SEEKER,    "Health Potion"),
+        create_enemy("Cave Troll",   120, 18, 9, DECEPTICON_LIEUTENANT,  "Iron Shield"),
     };
-    
-    entity_t enemy1 = {
-        .bravery = 0,
-        .attack = 10,
-        .defense = 10,
-        .current_hp = 10,
-        .max_hp = 10,
-        .name = "Starscream",
-        .potions = 0,
-        .magic_skill = 0,
-        .type = ENEMY_SEEKER
-    };
-    
-    entity_t enemy2 = {
-        .bravery = 0,
-        .attack = 10,
-        .defense = 10,
-        .current_hp = 10,
-        .max_hp = 10,
-        .name = "Frenzy",
-        .potions = 0,
-        .magic_skill = 0,
-        .type = ENEMY_DECEPTICON
-    };
-    
+    int dungeon_size = sizeof(dungeon) / sizeof(dungeon[0]);
 
-    printf("===================================\n");
-    printf("|   Legally Distinct from Zelda   |\n");
-    printf("|            the sequel           |\n");
-    printf("|=================================|\n");
-    
-    printf("Enter your hero's name> ");
-    fscanf(stdin, "%s", hero.name);
+    /* ── Combat sequence ────────────────────────────────────── */
+    for (int i = 0; i < dungeon_size; i++) {
+        printf("\nA %s [%s] appears!\n\n",
+               dungeon[i].name, enemy_type_name(dungeon[i].type));
 
-    do {
-            printf("%s Attacks!\n", hero.name);
-            enemy1.current_hp -= calculate_damage(hero, enemy1);
-            if (enemy1.current_hp < 0) enemy1.current_hp = 0;
-            printf("%s Counter-Attacks!\n", enemy1.name);
-            hero.current_hp -= calculate_damage(enemy1, hero);
-            printf("current hero health: %f\n", hero.current_hp);
-            if (hero.current_hp < 0) hero.current_hp = 0;
-            if (hero.current_hp) {
-                srand(time(NULL));
-                int dice_roll = rand() % 100;
-                if (dice_roll < hero.magic_skill) {
-                    heal(hero, potion_strength);
-                    hero.potions--;
-                }
-            }
-        print_stats(hero);
-        print_stats(enemy1);
-        printf("Enter 'd' to continue");
-        char enter;
-        fscanf(stdin, "%c", &enter);
+        int won = run_combat(&hero, &dungeon[i]);
 
-    } while (hero.current_hp > 0 && (enemy1.current_hp > 0));
-    
-    if (hero.current_hp == 0 && enemy1.current_hp == 0) {
-        printf("DRAW!\n");
-    } else if (enemy1.current_hp > 0) {
-        printf("%s WINS!\n", enemy1.name);
-    } else if (enemy1.current_hp > 0) {
-        printf("%s WINS!\n", enemy1.current_hp);
-    } else {
-        printf("%s WINS!\n", hero.name);
-    };
+        if (!won) {
+            printf("\nGame over.\n");
+            return 0;
+        }
 
+        printf("\nCurrent status:\n");
+        print_hero(&hero);
 
-    
+        if (i < dungeon_size - 1) {
+            printf("\nPress Enter to continue...\n");
+            fscanf(stdin, "%*[^\n]"); fscanf(stdin, "%*c");
+        }
+    }
+
+    /* ── Victory ────────────────────────────────────────────── */
+    printf("\n╔══════════════════════════════════════╗\n");
+    printf("║         DUNGEON CLEARED!             ║\n");
+    printf("╚══════════════════════════════════════╝\n");
+    print_hero(&hero);
+    printf("\nFinal inventory:\n");
+    inventory_print(hero.inventory, hero.inv_count);
+    printf("\n(File I/O next week — save that hard-won progress!)\n");
+
+    return 0;
 }
-
-void print_stats(entity_t entity) {
-    printf("====================\n");
-    printf("| %-18s|\n", entity.name);
-    printf("| HP: %lf           |\n", entity.current_hp);
-    printf("| ATTACK: %d DEF: %d|\n", entity.attack, entity.defense);
-    if (entity.bravery) printf("| BRAVERY: %d.      |\n", entity.bravery);
-    printf("====================|\n");
-
-}
-
-
-
