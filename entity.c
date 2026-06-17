@@ -4,7 +4,7 @@
 
    CHECKPOINT A — enemy_type_name()
      Short, demonstrates enum-to-string mapping
-     via switch. 
+     via switch.
      What should default return? What does an
      unknown EnemyType value mean in our game?
 

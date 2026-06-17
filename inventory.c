@@ -10,7 +10,7 @@
 
    CHECKPOINT B — inventory_has
      Why not == ? Because == compares addresses, not content.
-     
+
    CHECKPOINT C — inventory_add
      Combines has() with strncpy.
      - Check for duplicates first (call has())
@@ -31,7 +31,7 @@
 /* CHECKPOINT A — type this first */
 void inventory_print(char inventory[][ITEM_NAME_LEN], int count) {
     printf("┌─────────────────────────┐\n");
-    printf("│ Inventory (%d/%d)        │\n", count, MAX_ITEMS);
+    printf("│ Inventory (%d/%d)       │\n", count, MAX_ITEMS);
     printf("├─────────────────────────┤\n");
     if (count == 0) {
         printf("│ (empty)                 │\n");

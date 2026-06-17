@@ -17,9 +17,11 @@
    ============================================================ */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "combat.h"
 #include "inventory.h"
+#include "utils.h"
 
 void apply_damage_hero(Hero *h, int damage) {
     h->hp -= damage;
@@ -60,6 +62,7 @@ int run_combat(Hero *hero, Enemy *enemy) {
 
         /* ── Player choice ─────────────────────────────── */
         int choice;
+        char choice_input;
         do {
             printf("What will %s do?\n", hero->name);
             printf("  1) Attack\n");
@@ -69,7 +72,9 @@ int run_combat(Hero *hero, Enemy *enemy) {
             }
             printf("  4) Flee\n");
             printf("Choice: ");
-            fscanf(stdin, "%d ", &choice);
+            strcpy(&choice_input, input("Choice", 1));
+            printf("input: %s\n", &choice_input);
+            choice = atoi(&choice_input);
             if (choice < 1 || choice > 4) printf("Invalid. Try again.\n");
         } while (choice < 1 || choice > 4);
 

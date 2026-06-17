@@ -26,18 +26,18 @@
 #include "entity.h"
 #include "combat.h"
 #include "inventory.h"
+#include "utils.h"
 
 int main(void) {
 
-    printf("╔══════════════════════════════════════╗\n");
-    printf("║      Legally Distinct from Zelda - the Sequel       ║\n");
-    printf("║      Week 5a — The Great Refactor    ║\n");
-    printf("╚══════════════════════════════════════╝\n\n");
+    printf("╔════════════════════════════════════════════════╗\n");
+    printf("║      Legally Distinct from Zelda - the Sequel  ║\n");
+    printf("║      Week 5a — The Great Refactor              ║\n");
+    printf("╚════════════════════════════════════════════════╝\n\n");
 
     /* ── Hero creation ──────────────────────────────────────── */
     char hero_name[64];
-    printf("Enter your hero's name: ");
-    fscanf(stdin, "%63s", hero_name);
+    strcpy(hero_name, input("Enter your hero's name", 63));
 
     Hero hero = create_hero(hero_name, 100, 15, 5);
 
@@ -54,9 +54,9 @@ int main(void) {
        as an array of Enemy structs. No parallel arrays of names,
        HPs, attacks. One array, one type, clean iteration." */
     Enemy dungeon[] = {
-        create_enemy("Goblin Scout",  30,  7, 1, DECEPTICON_MINION, "Gold Coin"),
-        create_enemy("Orc Warrior",   70, 14, 6, DECEPTICON_SEEKER,    "Health Potion"),
-        create_enemy("Cave Troll",   120, 18, 9, DECEPTICON_LIEUTENANT,  "Iron Shield"),
+        create_enemy("Rumble",  30,  7, 1, DECEPTICON_MINION, "Gold Coin"),
+        create_enemy("Thundercracker",   70, 14, 6, DECEPTICON_SEEKER,    "Health Potion"),
+        create_enemy("Soundwave",   120, 18, 9, DECEPTICON_LIEUTENANT,  "Iron Shield"),
     };
     int dungeon_size = sizeof(dungeon) / sizeof(dungeon[0]);
 
